@@ -40,13 +40,14 @@
           this.buttonEl = document.querySelector("#add-note-button");
           this.buttonEl.addEventListener("click", () => {
             this.addNote();
-            this.clearNotes();
-            this.displayNotes();
             this.noteInputEl.value = "";
           });
         }
         addNote() {
-          this.model.addNote(this.noteInputEl.value);
+          this.api.uploadNote(this.noteInputEl.value, (response) => {
+            console.log("Note added!");
+            this.refreshNotes();
+          });
         }
         displayNotes() {
           this.model.getNotes().forEach((note) => {
@@ -54,13 +55,21 @@
             div.className = "note";
             div.innerText = note;
             this.mainContainerEl.append(div);
-            console.log("result of fetch request");
+            console.log("displaying notes");
           });
         }
         clearNotes() {
           const notes = document.querySelectorAll("div.note");
           notes.forEach((note) => {
             note.remove();
+          });
+        }
+        refreshNotes() {
+          this.clearNotes();
+          this.model.reset();
+          this.api.loadNotes((notes) => {
+            this.model.setNotes(notes);
+            this.displayNotes();
           });
         }
       };
@@ -75,6 +84,20 @@
         loadNotes(callback) {
           fetch("http://localhost:3000/notes").then((response) => response.json()).then((data) => {
             callback(data);
+          });
+        }
+        uploadNote(note, callback) {
+          fetch("http://localhost:3000/notes", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ content: note })
+          }).then((response) => response.json()).then((data) => {
+            console.log("Success", data);
+            callback(data);
+          }).catch((error) => {
+            console.log("Error:", error);
           });
         }
       };

@@ -10,19 +10,15 @@ class NotesView {
 
     this.buttonEl.addEventListener('click', () => {
       this.addNote();
-      this.clearNotes()
-      this.displayNotes();
       this.noteInputEl.value = ""
-
     });
   };
 
   addNote() {
-    // this.model.addNote(this.noteInputEl.value);
     this.api.uploadNote(this.noteInputEl.value, (response) => {
       console.log('Note added!')
-      console.log(response)
-    }))
+      this.refreshNotes()
+    })
   };
 
   displayNotes() {
@@ -31,7 +27,7 @@ class NotesView {
       div.className = "note";
       div.innerText = note;
       this.mainContainerEl.append(div);
-      console.log("result of fetch request")
+      console.log("displaying notes")
     });
   };
 
@@ -41,6 +37,15 @@ class NotesView {
       note.remove();
     });
   };
-}
+
+  refreshNotes() {
+    this.clearNotes();
+    this.model.reset()
+    this.api.loadNotes((notes) => {
+      this.model.setNotes(notes);
+      this.displayNotes();
+    });
+  };
+};
 
 module.exports = NotesView;

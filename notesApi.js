@@ -13,20 +13,17 @@ class NotesApi {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(note),
+      body: JSON.stringify({ content: note })
     })
     .then(response => response.json())
     .then(data => {
-      callback(data);
+      console.log('Success', data);
+      callback(data)
     })
     .catch((error) => {
-      console.error('Error:', error);
+      console.log('Error:', error);
     });
   }
 };
-
-const call = (data) => {
-  console.log(data)
-}
 
 module.exports = NotesApi;
